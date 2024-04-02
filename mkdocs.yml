@@ -1,0 +1,10 @@
+site_name: Sample documentation
+site_author: Matteo Spanio
+site_description: This is a sample documentation
+copyright: Copyright 2024, Matteo Spanio
+
+nav:
+  - Home: index.md
+  - Markdown Tutorial: markdown.md
+  - Flask Tutorial: flask.md
+  - Poetry Tutorial: poetry.md
