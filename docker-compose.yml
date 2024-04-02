@@ -1,0 +1,8 @@
+version: '3.9'
+
+services:
+  server:
+    image: flask-project-demo
+    build: .
+    ports:
+      - "8080:8080"
