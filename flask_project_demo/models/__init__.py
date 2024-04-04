@@ -1,6 +1,6 @@
 """Modulo contenente tutte le classi ORM collegate al database."""
 
-from sqlalchemy.orm import MappedAsDataclass, DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 
 
 class Base(MappedAsDataclass, DeclarativeBase):
@@ -11,15 +11,18 @@ class Base(MappedAsDataclass, DeclarativeBase):
     Eredita dalla classe MappedAsDataclass per poter usare la
     funzione jsonify di Flask.
 
-    See also
+    See Also
     --------
     serialize | deserialize
     """
 
-    pass
 
-
-from flask_project_demo.models.user import User, UserSchema, UserPostSchema
+from flask_project_demo.models.user import (  # noqa: E402
+    User,
+    UserPostSchema,
+    UserQuerySchema,
+    UserSchema,
+)
 
 """
 la variabile speciale `__all__` serve a definire quali
@@ -38,5 +41,6 @@ __all__ = [
     "Base",
     "User",
     "UserPostSchema",
+    "UserQuerySchema",
     "UserSchema",
 ]

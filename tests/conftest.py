@@ -1,13 +1,12 @@
-from flask import Flask
-from flask_project_demo.db import create_database, delete_database
 import pytest
+from flask import Flask
 from flask_project_demo import create_app
-from flask_project_demo.db import Session
+from flask_project_demo.db import Session, create_database, delete_database
 from flask_project_demo.models import User
 from werkzeug.security import generate_password_hash
 
 
-@pytest.fixture
+@pytest.fixture()
 def app():
     app = create_app("test")
 
@@ -28,12 +27,12 @@ def app():
     delete_database()
 
 
-@pytest.fixture
+@pytest.fixture()
 def client(app: Flask):
     return app.test_client()
 
 
-@pytest.fixture
+@pytest.fixture()
 def auth_client(client):
     response = client.post(
         "/api/v1/auth/login",
@@ -50,6 +49,6 @@ def auth_client(client):
     return client
 
 
-@pytest.fixture
+@pytest.fixture()
 def runner(app: Flask):
     return app.test_cli_runner()

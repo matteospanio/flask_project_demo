@@ -1,7 +1,9 @@
-#!/usr/bin/env python3
+"""Script per eseguire il server."""
 
-from flask_project_demo import create_app
+# !/usr/bin/env python3
+
 from dotenv import load_dotenv
+from flask_project_demo import create_app
 
 # leggo le variabili d'ambiente definite nel file .env
 load_dotenv()

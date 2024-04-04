@@ -5,7 +5,7 @@ class TestLogin:
     URL = "/api/v1/auth/login"
 
     @pytest.mark.parametrize(
-        "payload, expected",
+        ("payload", "expected"),
         [
             ({"email": "test@test.com", "password": "pwd"}, 200),
             ({"email": "test@test.com", "password": "password"}, 401),

@@ -1,17 +1,23 @@
-from flask import Blueprint, jsonify, request
+"""Blueprint relativa alla gestione degli utenti.
+
+L'API è in stile RESTful.
+"""
+
 from http import HTTPStatus
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from marshmallow import ValidationError
 from sqlalchemy import select
 from werkzeug.security import generate_password_hash
 
-from marshmallow import ValidationError
 from flask_project_demo.db import Session
 from flask_project_demo.models.user import (
     User,
-    UserPostSchema,
     UserPatchSchema,
+    UserPostSchema,
+    UserQuerySchema,
 )
-from flask_project_demo.typing import UserQuerySchema
 
 users = Blueprint("users", __name__)
 
@@ -49,7 +55,7 @@ def get_users():
 
 @users.get("/<int:id>")
 @jwt_required()
-def get_user(id: int):
+def get_user(id: int):  # noqa: A002
     """Get a user by ID."""
     with Session() as session:
         result = session.scalars(select(User).where(User.id == id)).one_or_none()
@@ -80,7 +86,7 @@ def create_user():
 
 @users.patch("/<int:id>")
 @jwt_required()
-def update_user(id):
+def update_user(id: int):  # noqa: A002
     """Update a user."""
     with Session() as session:
         user = session.scalars(select(User).where(User.id == id)).one_or_none()
@@ -112,7 +118,7 @@ def update_user(id):
 
 @users.delete("/<int:id>")
 @jwt_required()
-def delete_user(id):
+def delete_user(id: int):  # noqa: A002
     """Delete a user."""
     with Session() as session:
         user = session.scalars(select(User).where(User.id == id)).one_or_none()

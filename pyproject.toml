@@ -15,7 +15,6 @@ Flask = "^3.0.2"
 mkdocs = "^1.5.3"
 sqlalchemy = "^2.0.29"
 python-dotenv = "^1.0.1"
-faker = "^24.4.0"
 marshmallow = "^3.21.1"
 flask-jwt-extended = "^4.6.0"
 
@@ -28,3 +27,55 @@ ruff = "^0.3.5"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+src = ["flask_project_demo", "tests"]
+target-version = "py310"
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+select =[
+    "A",    # builtins
+    "B",    # bugbear
+    "BLE",  # blind exception
+    "C4",   # comprehensions
+    "C90",
+    "COM",  # commas
+    "D",    # pydocstyle
+    "E",    # pycodestyle
+    "EM",   # error messages
+    "F",    # pyflakes
+    "G",    # logging
+    "I",    # isort
+    "PIE",  # flake-8 pie
+    "PL",   # pylint
+    "PT",   # pytest
+    "PTH",  # use pathlib
+    "N",    # pep-naming
+    "RUF",  # ruff specific rules
+    "S",    # bandit
+    "SIM",  # flake8-simplify
+    "UP",   # pyupgrade
+    "W",    # pycodestyle warning
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+ignore-decorators = ["typing.overload"]
+
+[tool.ruff.lint.pylint]
+max-args = 7
+max-returns = 5
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["D", "RUF", "S", "A", "PLR6301"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]

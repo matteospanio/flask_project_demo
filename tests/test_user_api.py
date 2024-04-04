@@ -1,7 +1,9 @@
+from http import HTTPStatus
+
+import pytest
 from flask_project_demo.db import Session
 from flask_project_demo.models import User
 from sqlalchemy import select
-import pytest
 
 API_URL = "/api/v1/users/"
 
@@ -10,12 +12,12 @@ class TestGetUsers:
     def test_requires_authentication(self, client):
         response = client.get(API_URL)
 
-        assert response.status_code == 401
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
 
     def test_standard_usage(self, auth_client):
         response = auth_client.get(API_URL)
 
-        assert response.status_code == 200
+        assert response.status_code == HTTPStatus.OK
 
     def test_filtered_result(self, auth_client):
         response = auth_client.get(API_URL + "?name=Tester")
@@ -25,7 +27,7 @@ class TestGetUsers:
         assert response.json[0]["email"] == "test@test.com"
 
     @pytest.mark.parametrize(
-        "filter,expected",
+        ("filter", "expected"),
         [
             ("limit=-1", 400),
             ("offset=-1", 400),
@@ -47,17 +49,17 @@ class TestGetSingleUser:
     def test_requires_authentication(self, client):
         response = client.get(API_URL + "1")
 
-        assert response.status_code == 401
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
 
     def test_get_user(self, auth_client):
         response = auth_client.get(API_URL + "1")
 
-        assert response.status_code == 200
+        assert response.status_code == HTTPStatus.OK
 
 
 class TestPostUsers:
     @pytest.mark.parametrize(
-        "payload, expected",
+        ("payload", "expected"),
         [
             (
                 {
@@ -99,10 +101,10 @@ class TestPatchUser:
     def test_requires_authentication(self, client):
         response = client.patch(API_URL + "1", json={"name": "New Name"})
 
-        assert response.status_code == 401
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
 
     @pytest.mark.parametrize(
-        "payload, expected",
+        ("payload", "expected"),
         [
             ({"name": "New Name"}, 200),
             ({"email": "new_email"}, 400),
@@ -123,7 +125,7 @@ class TestPatchUser:
 
             assert response.status_code == expected
 
-            if response.status_code == 200:
+            if response.status_code == HTTPStatus.OK:
                 tester.name = "Tester"
                 tester.email = "test@test.com"
                 tester.password = "pwd"

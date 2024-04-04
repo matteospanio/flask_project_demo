@@ -1,12 +1,14 @@
 """Funzionalità legate alla creazione e gestione del database."""
 
 import os
+
 from sqlalchemy import create_engine
-import flask_project_demo.models as models
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
 )
+
+from flask_project_demo import models
 
 # leggo l'url del database dalle variabili d'ambiente
 # se non è definito utilizza una stringa di default
@@ -30,12 +32,11 @@ def create_database(conf: str | None = None) -> None:
         o "PRODUCTION" e può essere utile per decidere cosa fare in
         base alla situazione.
     """
-
     # importo tutte le classi collegate alle tabelle
 
     models.Base.metadata.create_all(bind=engine)
 
 
 def delete_database(conf: str | None = None) -> None:
-
+    """Svuota il database e rimuove le tabelle al suo interno."""
     models.Base.metadata.drop_all(bind=engine)
