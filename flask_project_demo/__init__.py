@@ -6,11 +6,16 @@ in cui si inizializzano i plugin di Flask.
 """
 
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from flask_project_demo.api import api
-from flask_project_demo.views import views
+
+from flask_project_demo.config import config
 
 
-def create_app():
+jwt_manager = JWTManager()
+
+
+def create_app(config_name: str = "default"):
     """Crea il server Flask.
 
     Questa funzione server per creare un'instanza del server Flask,
@@ -23,9 +28,10 @@ def create_app():
     """
 
     app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    jwt_manager.init_app(app)
 
     # aggiungo le blueprint
     app.register_blueprint(api, url_prefix="/api/v1")
-    app.register_blueprint(views)
 
     return app

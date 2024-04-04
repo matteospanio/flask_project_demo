@@ -2,28 +2,18 @@
 
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import MappedAsDataclass, DeclarativeBase
+import flask_project_demo.models as models
+from sqlalchemy.orm import (
+    scoped_session,
+    sessionmaker,
+)
 
 # leggo l'url del database dalle variabili d'ambiente
 # se non è definito utilizza una stringa di default
 DB_URI = os.getenv("DATABASE_URI") or "sqlite:////tmp/test.db"
 engine = create_engine(DB_URI)
 
-
-class Base(MappedAsDataclass, DeclarativeBase):
-    """Classe base per le tabelle del db.
-
-    Note
-    ----
-    Eredita dalla classe MappedAsDataclass per poter usare la
-    funzione jsonify di Flask.
-
-    See also
-    --------
-    serialize | deserialize
-    """
-
-    pass
+Session = scoped_session(sessionmaker(bind=engine))
 
 
 def create_database(conf: str | None = None) -> None:
@@ -42,6 +32,10 @@ def create_database(conf: str | None = None) -> None:
     """
 
     # importo tutte le classi collegate alle tabelle
-    import flask_project_demo.models
 
-    Base.metadata.create_all(bind=engine)
+    models.Base.metadata.create_all(bind=engine)
+
+
+def delete_database(conf: str | None = None) -> None:
+
+    models.Base.metadata.drop_all(bind=engine)
