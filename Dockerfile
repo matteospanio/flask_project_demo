@@ -18,6 +18,4 @@ RUN pip install -e . --no-cache-dir
 
 RUN server-cli init-db
 
-RUN server-cli add-data --num 500
-
 CMD ["python", "scripts/runner.py"]
