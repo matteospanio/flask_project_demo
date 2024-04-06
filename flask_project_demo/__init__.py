@@ -6,12 +6,11 @@ in cui si inizializzano i plugin di Flask.
 """
 
 from flask import Flask
-from flask_jwt_extended import JWTManager
 
 from flask_project_demo.api import api
+from flask_project_demo.api.auth import refresh_expiring_token
 from flask_project_demo.config import config
-
-jwt_manager = JWTManager()
+from flask_project_demo.plugins import jwt_manager
 
 
 def create_app(config_name: str = "default"):
@@ -28,6 +27,7 @@ def create_app(config_name: str = "default"):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     jwt_manager.init_app(app)
+    app.after_request(refresh_expiring_token)
 
     # aggiungo le blueprint
     app.register_blueprint(api, url_prefix="/api/v1")

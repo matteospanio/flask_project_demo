@@ -6,9 +6,10 @@ L'API è in stile RESTful.
 from http import HTTPStatus
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import current_user, get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 
 from flask_project_demo.db import Session
@@ -79,7 +80,10 @@ def create_user():
     )
     with Session() as session:
         session.add(new_user)
-        session.commit()
+        try:
+            session.commit()
+        except IntegrityError:
+            return {"message": "User already exists!"}, HTTPStatus.CONFLICT
 
     return {"message": "User created!"}, HTTPStatus.CREATED
 
@@ -88,22 +92,24 @@ def create_user():
 @jwt_required()
 def update_user(id: int):  # noqa: A002
     """Update a user."""
+    data = request.get_json()
+
+    try:
+        UserPatchSchema().load(data)
+    except ValidationError:
+        return {"message": "Invalid data in request."}, HTTPStatus.BAD_REQUEST
+
+    if data == {}:
+        return {"message": "No data provided in request."}, HTTPStatus.BAD_REQUEST
+
+    if current_user.id != id:
+        return {"message": "Unauthorized access."}, HTTPStatus.UNAUTHORIZED
+
     with Session() as session:
         user = session.scalars(select(User).where(User.id == id)).one_or_none()
 
         if not user:
             return {"message": f"User {id} not found!"}, HTTPStatus.NOT_FOUND
-
-        data = request.get_json()
-        try:
-            UserPatchSchema().load(data)
-        except ValidationError:
-            return {"message": "Invalid data in request."}, HTTPStatus.BAD_REQUEST
-        if data == {}:
-            return {"message": "No data provided in request."}, HTTPStatus.BAD_REQUEST
-
-        if get_jwt_identity() != user.email:
-            return {"message": "Unauthorized access."}, HTTPStatus.UNAUTHORIZED
 
         if "name" in data:
             user.name = data["name"]

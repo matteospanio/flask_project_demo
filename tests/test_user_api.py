@@ -84,6 +84,14 @@ class TestPostUsers:
                 },
                 400,
             ),
+            (
+                {
+                    "name": "prova",
+                    "email": "test@test.com",
+                    "password": "pwd",
+                },
+                409,
+            ),
             ({}, 400),
         ],
     )
@@ -103,19 +111,18 @@ class TestPatchUser:
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
 
+    def test_unauthorized(self, auth_client):
+        response = auth_client.patch(API_URL + "2", json={"name": "New Name"})
+
+        assert response.status_code == HTTPStatus.UNAUTHORIZED
+
     @pytest.mark.parametrize(
-        ("payload", "expected"),
-        [
-            ({"name": "New Name"}, 200),
-            ({"email": "new_email"}, 400),
-            ({"email": "new@email.com"}, 200),
-            ({"password": "new_password"}, 200),
-            ({}, 400),
-        ],
+        "payload",
+        [{"email": "new_email"}, {"password": 1}, {}],
     )
-    def test_change_record(self, auth_client, payload, expected):
+    def test_bad_request_payload(self, auth_client, payload):
         with Session() as session:
-            query = select(User).where(User.name == "Tester")
+            query = select(User).where(User.email == "test@test.com")
             tester = session.scalars(query).one()
 
             response = auth_client.patch(
@@ -123,10 +130,29 @@ class TestPatchUser:
                 json=payload,
             )
 
-            assert response.status_code == expected
+            assert response.status_code == HTTPStatus.BAD_REQUEST
 
-            if response.status_code == HTTPStatus.OK:
-                tester.name = "Tester"
-                tester.email = "test@test.com"
-                tester.password = "pwd"
-                session.commit()
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {"name": "New Name"},
+            {"email": "new@email.com"},
+            {"password": "new_password"},
+        ],
+    )
+    def test_ok_request(self, auth_client, payload):
+        with Session() as session:
+            query = select(User).where(User.email == "test@test.com")
+            tester = session.scalars(query).one()
+
+            response = auth_client.patch(
+                f"{API_URL}{tester.id}",
+                json=payload,
+            )
+
+            assert response.status_code == HTTPStatus.OK
+
+            tester.name = "Tester"
+            tester.email = "test@test.com"
+            tester.password = "pwd"
+            session.commit()
