@@ -117,7 +117,11 @@ def update_user(id: int):  # noqa: A002
             user.email = data["email"]
         if "password" in data:
             user.password = data["password"]
-        session.commit()
+
+        try:
+            session.commit()
+        except IntegrityError:
+            return {"message": "Email already exists!"}, HTTPStatus.CONFLICT
 
     return {"message": f"User {id} updated!"}, HTTPStatus.OK
 

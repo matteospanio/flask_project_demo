@@ -27,6 +27,21 @@ class TestGetUsers:
         assert response.json[0]["email"] == "test@test.com"
 
     @pytest.mark.parametrize(
+        "query",
+        [
+            "limit=-3",
+            "offset=-2",
+            "order=invalid",
+            "limit=-10&email=test",
+            "name=Tester&limit=-5",
+        ],
+    )
+    def test_invalid_query(self, auth_client, query):
+        response = auth_client.get(API_URL + "?" + query)
+
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+
+    @pytest.mark.parametrize(
         ("filter", "expected"),
         [
             ("limit=-1", 400),
@@ -125,12 +140,28 @@ class TestPatchUser:
             query = select(User).where(User.email == "test@test.com")
             tester = session.scalars(query).one()
 
-            response = auth_client.patch(
-                f"{API_URL}{tester.id}",
-                json=payload,
-            )
+        response = auth_client.patch(
+            f"{API_URL}{tester.id}",
+            json=payload,
+        )
 
-            assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+
+    def test_failing_email_update(self, auth_client):
+        new_user = User(name="New User", email="ciao@ciao.com", hashed_password="pwd")
+        with Session() as session:
+            session.add(new_user)
+            session.commit()
+
+            query = select(User).where(User.email == "test@test.com")
+            tester = session.scalars(query).one()
+
+        response = auth_client.patch(
+            f"{API_URL}{tester.id}",
+            json={"email": "ciao@ciao.com"},
+        )
+
+        assert response.status_code == HTTPStatus.CONFLICT
 
     @pytest.mark.parametrize(
         "payload",

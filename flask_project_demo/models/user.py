@@ -127,7 +127,7 @@ class UserQuerySchema(Schema):
 class User(Base):
     """Tabella "user"."""
 
-    __tablename__ = "user"
+    __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
     name: Mapped[str] = mapped_column(String(32))
     email: Mapped[str] = mapped_column(String(64), unique=True)
