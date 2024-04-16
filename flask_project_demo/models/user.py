@@ -79,7 +79,7 @@ class UserQuerySchema(Schema):
     """Schema per validare la query string di filtraggio lista utenti."""
 
     name = fields.String(metadata={"description": "Username", "example": "Mario Rossi"})
-    email = fields.String(
+    email = fields.Email(
         metadata={"description": "Email", "example": "mario@example.com"},
     )
     limit = fields.Integer(
